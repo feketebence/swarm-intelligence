@@ -1,6 +1,6 @@
 Rewrite:
 - [x] initializer
 - [x] globaldata
-- [ ] running
+- [ ] running: buggy
 - [x] timing
-- [ ] main
+- [ ] main: not needed
