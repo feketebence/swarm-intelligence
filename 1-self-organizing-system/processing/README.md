@@ -1,6 +1,7 @@
 # How to use Processing in IntelliJ Idea? - Useful links
 #### [this Stackoverflow question](https://stackoverflow.com/questions/36765288/how-to-use-processing-3-on-intellij-idea)
 #### [Written tutorial: Processing in Java](https://happycoding.io/tutorials/java/processing-in-java)
+#### [Written tutorial: Use P2D and P3D renderers in Processing sketches](https://gilspot.net/blog/using-p2d-and-p3d-renderers-kotlin-processing-sketches)
 
 # Steps
 1. Download `processing 3.5.4` from [this link](https://processing.org/download).
