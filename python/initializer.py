@@ -3,11 +3,11 @@ import random
 import time
 from pprint import pprint
 
+import numpy as np
+
 g = {}
 
 def init_simulation():
-    # global g
-    # g = {}
 
     g['start_time_epoch'] = time.time()
 
@@ -23,6 +23,7 @@ def init_simulation():
     g['Verlet_intershell_squared'] = g['Verlet_cutoff_distance'] - g['particle_particle_screening_length']
     g['Verlet_intershell_squared'] = g['Verlet_intershell_squared'] / 2.0
     g['Verlet_intershell_squared'] *= g['Verlet_intershell_squared']
+
     print(f"Verlet cutoff distance = {g['Verlet_cutoff_distance']}")
     print(f"Half of Verlet intershell distance = {math.sqrt(g['Verlet_intershell_squared'])}")
     print(f"Half of Verlet intershell distance squared = {g['Verlet_intershell_squared']}")
@@ -36,14 +37,16 @@ def init_simulation():
     print()
 
 def init_simulation_box():
-    print("Initializing the simulation box");
+    print("Initializing the simulation box")
     
-    g['SX'] = 120.0
-    g['SY'] = 120.0
+    g['SX'] = 12.0
+    g['SY'] = 12.0
     g['halfSX'] = g['SX'] / 2.0
     g['halfSY'] = g['SY'] / 2.0
 
     print(f"SX = {g['SX']}, SY = {g['SY']}")
+    print(f"halfSX = {g['halfSX']}, halfSY = {g['halfSY']}")
+
     print()
 
 def distance_folded_PBC(x0: float, y0: float, x1: float, y1: float):
@@ -59,11 +62,11 @@ def distance_folded_PBC(x0: float, y0: float, x1: float, y1: float):
     # PBC foldback: if the distance is larger than half the box the copy in the neighboring box is closer
     if dx > g['halfSX']: dx -= g['SX']
     if dx <= -g['halfSX']: dx += g['SX']
-    # NOTE: ide nem dy kellene? igy: dy -= g['SY']
+    
     if dy > g['halfSY']: dx -= g['SY']
     if dy <= -g['halfSY']: dx += g['SY']
 
-    r = math.sqrt(dx ** 2 + dy ** 2)
+    r = math.sqrt(dx * dx + dy * dy)
 
     return r
 
@@ -75,23 +78,23 @@ def init_particles_randomly():
         y_try = 0.0
 
         # check overlap with previous particles, assume there is overlap to get into the cycle
-        overlap = 1
+        overlap = True
         N_trials = 0
 
-        while overlap == 1 and N_trials < g['N_particles']:
+        while overlap == True and N_trials < g['N_particles']:
             # attempt to place the particle
             x_try = g['SX'] * random.uniform(0, 1)
             y_try = g['SY'] * random.uniform(0, 1)
 
             # assume this was good
-            overlap = 0
+            overlap = False
 
             for j in range(i):
                 # calculate distance
                 dr = distance_folded_PBC(x_try, y_try, g['particle_x'][j], g['particle_y'][j])
 
                 if dr < r_min:
-                    overlap = 1
+                    overlap = True
                     N_trials += 1
                     break
         
@@ -119,17 +122,18 @@ def init_particles_randomly():
     print()
 
 def init_particles():
-    g['N_particles'] = 10
+    g['N_particles'] = 30
 
-    g['particle_x'] = [0.0 for i in range(g['N_particles'])]
-    g['particle_y'] = [0.0 for i in range(g['N_particles'])]
-    g['particle_fx'] = [0.0 for i in range(g['N_particles'])]
-    g['particle_fy'] = [0.0 for i in range(g['N_particles'])]
-    g['particle_color'] = [0 for i in range(g['N_particles'])]
-    g['particle_dx_so_far'] = [0.0 for i in range(g['N_particles'])]
-    g['particle_dy_so_far'] = [0.0 for i in range(g['N_particles'])]
+    n_particles = g['N_particles']
+    g['particle_x'] = np.ones(n_particles)
+    g['particle_y'] = np.ones(n_particles)
+    g['particle_fx'] = np.ones(n_particles)
+    g['particle_fy'] = np.ones(n_particles)
+    g['particle_color'] = np.zeros(n_particles)
+    g['particle_dx_so_far'] = np.ones(n_particles)
+    g['particle_dy_so_far'] = np.ones(n_particles)
 
-    g['particle_direction'] = [0.0 for i in range(g['N_particles'])]
+    g['particle_direction'] = np.ones(n_particles)
 
     init_particles_randomly()
 
@@ -138,14 +142,16 @@ def init_particles():
 
 def init_files():
 
-    g['moviefile'] = open("particles.mvi", "wb") # use wt for text mode, b is binary mode
+    g['moviefile_name'] = "particles.mvi"
+    g['moviefile'] = open(g['moviefile_name'], "wb") # use wt for text mode, b is binary mode
     if g['moviefile'] == None:
-        print('Could not create/open movie file: "particles.mvi"')
+        print(f"Could not create/open movie file: {g['moviefile_name']}")
         exit(2)
 
-    g['statisticsfile'] = open("statistics.txt", "wt")
+    g['statisticsfile_name'] = "statistics.txt"
+    g['statisticsfile'] = open(g['statisticsfile_name'], "wt")
     if g['statisticsfile'] == None:
-        print('Could not create/open movie file: "statistics.mvi"')
+        print(f"Could not create/open movie file: {g['statisticsfile_name']}")
         exit(2)
 
     g['stat_all_movement_red_x'] = 0.0
