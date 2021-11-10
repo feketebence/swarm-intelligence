@@ -2,6 +2,7 @@
 #### [this Stackoverflow question](https://stackoverflow.com/questions/36765288/how-to-use-processing-3-on-intellij-idea)
 #### [Written tutorial: Processing in Java](https://happycoding.io/tutorials/java/processing-in-java)
 
+# Steps
 1. Download `processing 3.5.4` from [this link](https://processing.org/download).
 2. Extract the downloaded archive and add the following libraries to the CLASSPATH:
     - processing-3.5.4/core/library/core.jar
